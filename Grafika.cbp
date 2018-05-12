@@ -56,13 +56,13 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="draw.h" />
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="model.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="model.h" />
-		<Unit filename="origin.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="utils.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -342,3 +342,12 @@
 	"utils.h"
 	<math.h>
 
+1526142577 source:c:\users\lord-\documents\grafika\main.c
+	"camera.h"
+	"model.h"
+	"draw.h"
+	<GL/glut.h>
+	<stdio.h>
+	<SOIL/SOIL.h>
+	<math.h>
+
