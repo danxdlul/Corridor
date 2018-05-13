@@ -1,3 +1,2 @@
 all:
-	gcc origin.c camera.c utils.c -lglut -lGL -lGLU -lm -o origin
-
+	gcc main.c camera.c utils.c model.c draw.c -lglut -lGL -lGLU -lm -o grafika
