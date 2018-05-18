@@ -279,7 +279,7 @@
 
 1215450808 c:\program files (x86)\codeblocks\mingw\include\soil\soil.h
 
-1526140378 source:c:\users\lord-\documents\grafika\camera.c
+1526604747 source:c:\users\lord-\documents\grafika\camera.c
 	"camera.h"
 	"utils.h"
 	<GL/glut.h>
@@ -342,7 +342,48 @@
 	"utils.h"
 	<math.h>
 
-1526142577 source:c:\users\lord-\documents\grafika\main.c
+1526596126 source:c:\users\lord-\documents\grafika\main.c
+	"camera.h"
+	"model.h"
+	"draw.h"
+	<GL/glut.h>
+	<stdio.h>
+	<SOIL/SOIL.h>
+	<math.h>
+
+1526604747 source:c:\users\lord-\documents\github\corridor\camera.c
+	"camera.h"
+	"utils.h"
+	<GL/glut.h>
+	<math.h>
+
+1526141776 c:\users\lord-\documents\github\corridor\camera.h
+	"model.h"
+
+1459861620 c:\users\lord-\documents\github\corridor\model.h
+	<stdio.h>
+
+1460821926 c:\users\lord-\documents\github\corridor\utils.h
+
+1459924542 source:c:\users\lord-\documents\github\corridor\draw.c
+	"draw.h"
+	<GL/glut.h>
+	<stdio.h>
+
+1526141775 c:\users\lord-\documents\github\corridor\draw.h
+	"model.h"
+
+1460472108 source:c:\users\lord-\documents\github\corridor\model.c
+	"model.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1460821940 source:c:\users\lord-\documents\github\corridor\utils.c
+	"utils.h"
+	<math.h>
+
+1526605770 source:c:\users\lord-\documents\github\corridor\main.c
 	"camera.h"
 	"model.h"
 	"draw.h"

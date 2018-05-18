@@ -31,8 +31,8 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="../../../../Program Files (x86)/CodeBlocks/MinGW/lib/libSOIL.a" />
-					<Add library="../../../../Program Files (x86)/CodeBlocks/MinGW/lib/libopengl32.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libSOIL.a" />
+					<Add library="C:/Program Files (x86)/CodeBlocks/MinGW/lib/libopengl32.a" />
 				</Linker>
 			</Target>
 		</Build>

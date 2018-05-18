@@ -11,6 +11,7 @@
 #define CAMERA_SPEED 1.0
 
 int mouse_x, mouse_y;
+int needhelp = 0;
 GLfloat spot_direction[] = {0.0f,1.0f,-2.0f};
 GLfloat light_color[] = {0.2f, 0.2f, 0.2f, 1.0f};
 GLfloat light_ambient[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -29,6 +30,7 @@ GLfloat light_position6[] = {-23.0f, 25.0f, 4.0f, 1.0f};
 GLuint sky_texture_id;
 GLuint texture_id;
 GLuint ground_texture_id;
+GLuint help_texture_id;
 int onground = 1;
 int jumppeaked = 0;
 int sprint = 2;
@@ -45,7 +47,13 @@ struct Action
     int step_right;
     int jump;
 };
-
+void display();
+void key_handler(int key, int x, int y);
+void key_up_handler(int key, int x, int y);
+void mouse_handler(int button, int state, int x, int y);
+void motion_handler(int x, int y);
+void key_handler_help(int key, int x, int y);
+void idle();
 struct Action action;
 int time;
 
@@ -68,10 +76,6 @@ GLuint load_texture(char* filename)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-/*
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-*/
     glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
 
     return texture_name;
@@ -123,7 +127,8 @@ double calc_elapsed_time()
     return elapsed_time;
 }
 void draw_lightfog(){
-    GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
+    GLfloat fogColor[] = {0.5f, 0.1f, 0.1f, 1};
+    glHint(GL_FOG_HINT, GL_NICEST);
     glFogfv(GL_FOG_COLOR, fogColor);
     glFogi(GL_FOG_MODE, GL_EXP2);
     glFogf(GL_FOG_DENSITY,0.5f);
@@ -161,19 +166,60 @@ void draw_lightfog(){
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, light_ambient);
     glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,mat_emission);
     }
+void helpdisplay(){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, help_texture_id);
+
+    glBegin(GL_QUADS);
+
+    glTexCoord2f(0.0,0.0);
+    glVertex3d(-7.0,7.0,0.0);
+
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3d(-7.0,-7.0,0.0);
+
+
+    glTexCoord2f(1.0, 1.0);
+    glVertex3d(7.0,-7.0,0.0);
+
+
+    glTexCoord2f(1.0,0.0);
+    glVertex3d(7.0,7.0,0.0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+    glPopMatrix();
+    glutSwapBuffers();
+    if(needhelp == 0)
+    {
+        glutDisplayFunc(display);
+        glutKeyboardFunc(key_handler);
+        glutKeyboardUpFunc(key_up_handler);
+        glutMouseFunc(mouse_handler);
+        glutMotionFunc(motion_handler);
+        glMatrixMode (GL_PROJECTION);
+        glLoadIdentity();
+        int width = glutGet(GLUT_WINDOW_WIDTH);
+        int height = glutGet(GLUT_WINDOW_HEIGHT);
+        gluPerspective(50.0, (GLdouble)width / (GLdouble)height, 0.01, 10000.0);
+        glEnable(GL_LIGHTING);
+    }
+}
 void display()
 {
     double elapsed_time;
     draw_lightfog();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glMatrixMode(GL_MODELVIEW);
-
-	glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
     elapsed_time = calc_elapsed_time();
     update_camera_position(&camera, elapsed_time);
 	set_view_point(&camera);
-
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,texture_id);
     draw_model(&model);
@@ -184,9 +230,25 @@ void display()
     glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,sky_emission);
     glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,light_color);
     draw_skybox();
-
 	glutSwapBuffers();
+	if(needhelp == 1){
+        glutKeyboardFunc(idle);
+        glutKeyboardUpFunc(idle);
+        glutMouseFunc(idle);
+        glutMotionFunc(idle);
+        action.move_forward = FALSE;
+        action.move_backward = FALSE;
+        action.step_left = FALSE;
+        action.step_right = FALSE;
+        action.jump = FALSE;
+        glMatrixMode (GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(-9.0, 9.0, -9.0, 9.0, 0.0, 30.0);
+        glDisable(GL_LIGHTING);
+        glutDisplayFunc(helpdisplay);
+	}
 }
+
 void draw_skybox()
 {
     double theta, phi1, phi2;
@@ -257,22 +319,27 @@ void reshape(GLsizei width, GLsizei height)
     glViewport (x, y, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(50.0, (GLdouble)width / (GLdouble)height, 0.01, 10000.0);
-}
 
+	if(needhelp == 1)
+        {
+            glOrtho(-9.0, 9.0, -9.0, 9.0, 0.0, 30.0);
+        }
+    else
+        {
+            gluPerspective(50.0, (GLdouble)width / (GLdouble)height, 0.01, 10000.0);
+        }
+}
 void mouse_handler(int button, int state, int x, int y)
 {
 	mouse_x = x;
 	mouse_y = y;
 }
-
 void motion_handler(int x, int y)
 {
 	double horizontal, vertical;
 
 	horizontal = mouse_x - x;
 	vertical = mouse_y - y;
-
 	rotate_camera(&camera, horizontal, vertical);
 
 	mouse_x = x;
@@ -280,7 +347,6 @@ void motion_handler(int x, int y)
 
     glutPostRedisplay();
 }
-
 void key_handler(int key, int x, int y)
 {
 
@@ -348,10 +414,24 @@ void key_handler(int key, int x, int y)
         else{
             glEnable(GL_FOG);
         }
+        break;
 	}
 	glutPostRedisplay();
 }
+void speckeys(int key, int x, int y)
+{
+    switch(key)
+    {
+    case GLUT_KEY_F1:
+        if(needhelp == 0){
+            needhelp = 1;
+        }
+        else{
+            needhelp = 0;
+        }
+    }
 
+}
 void key_up_handler(int key, int x, int y)
 {
 	switch (key) {
@@ -407,6 +487,7 @@ void initialize()
     texture_id = load_texture("brick-wall-texture.jpg");
     sky_texture_id = load_texture("sky.jpg");
     ground_texture_id = load_texture("ground_texture.jpg");
+    help_texture_id = load_texture("help_texture.png");
     glClearDepth(1.0);
 
 
@@ -422,7 +503,7 @@ int main(int argc, char* argv[])
     print_bounding_box(&model);
     glutInit(&argc, argv);
 
-	glutInitWindowSize(640, 480);
+	glutInitWindowSize(1920, 1080);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	int window = glutCreateWindow("GLUT Window");
 	glutSetWindow(window);
@@ -437,6 +518,7 @@ int main(int argc, char* argv[])
     glutMouseFunc(mouse_handler);
     glutMotionFunc(motion_handler);
     glutIdleFunc(idle);
+    glutSpecialFunc(speckeys);
 
     init_camera(&camera);
 
